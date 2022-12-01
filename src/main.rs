@@ -3,13 +3,13 @@ use std::io::{self, BufRead};
 use std::path::Path;
 
 fn main() {
+    let mut current_calories: i32 = 0;
     let mut max_calories_1: i32 = 0;
     let mut max_calories_2: i32 = 0;
     let mut max_calories_3: i32 = 0;
 
     let mut current_elf: i32 = 1;
     if let Ok(lines) = read_lines("./day1.txt") {
-        let mut current_calories: i32 = 0;
         for line in lines {
             if let Ok(cal_str) = line {
                 let cal = match cal_str.parse::<i32>() {
