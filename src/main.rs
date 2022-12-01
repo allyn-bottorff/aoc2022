@@ -35,7 +35,6 @@ fn main() {
         }
     }
     let top_3_sum = max_calories_1 + max_calories_2 + max_calories_3;
-    println!("Hello, world!");
     println!("Max Calories: {}", max_calories_1);
     println!("From Elf: {}", current_elf);
     println!(
