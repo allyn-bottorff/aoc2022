@@ -10,6 +10,7 @@ enum RPSChoice {
     Scissors,
 }
 
+/// Read lines from a file
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
     P: AsRef<Path>,
@@ -18,6 +19,8 @@ where
     Ok(io::BufReader::new(file).lines())
 }
 
+/// Get top calories.
+/// Implements day1 part 1 and part 2 solutions
 fn get_top_calories(file: &str) {
     let mut current_calories: i32 = 0;
     let mut max_cal_1: i32 = 0;
@@ -60,6 +63,7 @@ fn get_top_calories(file: &str) {
     println!("Sum of top 3: {}", top_3_sum);
 }
 
+/// Play the rock paper scissors game using day 2 part 1 rules.
 fn rock_paper_scissors(file: &str) -> i32 {
     let mut score: i32 = 0;
     if let Ok(lines) = read_lines(file) {
@@ -89,6 +93,7 @@ fn rock_paper_scissors(file: &str) -> i32 {
     score
 }
 
+/// Play the rock paper scissors game using day 2 part 2 rules.
 fn rock_paper_scissors2(file: &str) -> i32 {
     let mut score: i32 = 0;
     if let Ok(lines) = read_lines(file) {
@@ -119,6 +124,8 @@ fn rock_paper_scissors2(file: &str) -> i32 {
     println!("Your score: {}", score);
     score
 }
+
+/// Pick a winning choice based on the opponent's choice
 fn rps_pick_win(c1: &RPSChoice) -> RPSChoice {
     let win = match c1 {
         RPSChoice::Rock => RPSChoice::Paper,
@@ -128,6 +135,7 @@ fn rps_pick_win(c1: &RPSChoice) -> RPSChoice {
     win
 }
 
+/// Pick a losing choice based on the opponent's choice
 fn rps_pick_lose(c1: &RPSChoice) -> RPSChoice {
     let lose = match c1 {
         RPSChoice::Rock => RPSChoice::Scissors,
@@ -137,6 +145,7 @@ fn rps_pick_lose(c1: &RPSChoice) -> RPSChoice {
     lose
 }
 
+/// Calculate the score of a Rock Paper Scissors game.
 fn score_rps(c1: RPSChoice, c2: RPSChoice) -> i32 {
     let score = match (c1, c2) {
         (RPSChoice::Rock, RPSChoice::Rock) => 1 + 3,
