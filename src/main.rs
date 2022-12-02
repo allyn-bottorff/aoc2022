@@ -162,19 +162,10 @@ fn main() {
         let selection = &args[1];
 
         match selection.as_str() {
-            "d1" => {
-                get_top_calories("./day1.txt");
-            }
-
-            "d2" => {
-                rock_paper_scissors("./day2.txt");
-            }
-            "d2-2" => {
-                rock_paper_scissors2("./day2.txt");
-            }
-            _ => {
-                println!("Unrecognized command.");
-            }
+            "d1" => _ = get_top_calories("./day1.txt"),
+            "d2" => _ = rock_paper_scissors("./day2.txt"),
+            "d2-2" => _ = rock_paper_scissors2("./day2.txt"),
+            _ => println!("Unrecognized command."),
         }
     } else {
         println!("Pick a day to run. e.g. \"d1\"");
