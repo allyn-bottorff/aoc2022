@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+#[derive(Copy, Clone)]
 enum RPSChoice {
     Rock,
     Paper,
@@ -88,6 +89,54 @@ fn rock_paper_scissors(file: &str) -> i32 {
     score
 }
 
+fn rock_paper_scissors2(file: &str) -> i32 {
+    let mut score: i32 = 0;
+    if let Ok(lines) = read_lines(file) {
+        for line in lines {
+            if let Ok(line_string) = line {
+                // Using unwrap() here because if this fails, it' better to
+                // crash.
+                let opp_char = line_string.as_str().chars().nth(0).unwrap();
+                let you_char = line_string.as_str().chars().nth(2).unwrap();
+
+                let opp_choice = match opp_char {
+                    'A' => RPSChoice::Rock,
+                    'B' => RPSChoice::Paper,
+                    'C' => RPSChoice::Scissors,
+                    _ => panic!("Failed to parse move"),
+                };
+                let your_choice = match you_char {
+                    'X' => rps_pick_lose(&opp_choice),
+                    'Y' => opp_choice,
+                    'Z' => rps_pick_win(&opp_choice),
+                    _ => panic!("Failed to parse move"),
+                };
+                score += score_rps(opp_choice, your_choice);
+            }
+        }
+    }
+
+    println!("Your score: {}", score);
+    score
+}
+fn rps_pick_win(c1: &RPSChoice) -> RPSChoice {
+    let win = match c1 {
+        RPSChoice::Rock => RPSChoice::Paper,
+        RPSChoice::Paper => RPSChoice::Scissors,
+        RPSChoice::Scissors => RPSChoice::Rock,
+    };
+    win
+}
+
+fn rps_pick_lose(c1: &RPSChoice) -> RPSChoice {
+    let lose = match c1 {
+        RPSChoice::Rock => RPSChoice::Scissors,
+        RPSChoice::Paper => RPSChoice::Rock,
+        RPSChoice::Scissors => RPSChoice::Paper,
+    };
+    lose
+}
+
 fn score_rps(c1: RPSChoice, c2: RPSChoice) -> i32 {
     let score = match (c1, c2) {
         (RPSChoice::Rock, RPSChoice::Rock) => 1 + 3,
@@ -120,6 +169,9 @@ fn main() {
             "d2" => {
                 rock_paper_scissors("./day2.txt");
             }
+            "d2-2" => {
+                rock_paper_scissors2("./day2.txt");
+            }
             _ => {
                 println!("Unrecognized command.");
             }
@@ -138,5 +190,11 @@ mod tests {
         let score = rock_paper_scissors("./day2test.txt");
 
         assert_eq!(score, 15)
+    }
+    #[test]
+    fn test_day2_2() {
+        let score = rock_paper_scissors2("./day2test.txt");
+
+        assert_eq!(score, 12)
     }
 }
