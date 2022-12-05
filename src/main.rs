@@ -392,13 +392,13 @@ fn main() {
         let selection = &args[1];
 
         match selection.as_str() {
-            "d1" => _ = get_top_calories("./day1.txt"),
-            "d2" => _ = rock_paper_scissors("./day2.txt"),
-            "d2-2" => _ = rock_paper_scissors2("./day2.txt"),
-            "d3" => _ = rucksack_sorting("./day3.txt"),
-            "d3-2" => _ = rucksack_badge_search("./day3.txt"),
-            "d4" => _ = find_complete_overlaps("./day4.txt"),
-            "d4-2" => _ = find_partial_overlaps("./day4.txt"),
+            "d1" => _ = get_top_calories("./data/day1.txt"),
+            "d2" => _ = rock_paper_scissors("./data/day2.txt"),
+            "d2-2" => _ = rock_paper_scissors2("./data/day2.txt"),
+            "d3" => _ = rucksack_sorting("./data/day3.txt"),
+            "d3-2" => _ = rucksack_badge_search("./data/day3.txt"),
+            "d4" => _ = find_complete_overlaps("./data/day4.txt"),
+            "d4-2" => _ = find_partial_overlaps("./data/day4.txt"),
             _ => println!("Unrecognized command."),
         }
     } else {
@@ -412,37 +412,37 @@ mod tests {
 
     #[test]
     fn test_day2_1() {
-        let score = rock_paper_scissors("./day2test.txt");
+        let score = rock_paper_scissors("./data/day2test.txt");
 
         assert_eq!(score, 15)
     }
     #[test]
     fn test_day2_2() {
-        let score = rock_paper_scissors2("./day2test.txt");
+        let score = rock_paper_scissors2("./data/day2test.txt");
 
         assert_eq!(score, 12)
     }
 
     #[test]
     fn test_day3_1() {
-        let priority_sum = rucksack_sorting("./day3test.txt");
+        let priority_sum = rucksack_sorting("./data/day3test.txt");
 
         assert_eq!(priority_sum, 157)
     }
     #[test]
     fn test_day3_2() {
-        let priority_sum = rucksack_badge_search("./day3test.txt");
+        let priority_sum = rucksack_badge_search("./data/day3test.txt");
 
         assert_eq!(priority_sum, 70)
     }
     #[test]
     fn test_day4_1() {
-        let overlaps = find_complete_overlaps("./day4test.txt");
+        let overlaps = find_complete_overlaps("./data/day4test.txt");
         assert_eq!(overlaps, 2)
     }
     #[test]
     fn test_day4_2() {
-        let overlaps = find_partial_overlaps("./day4test.txt");
+        let overlaps = find_partial_overlaps("./data/day4test.txt");
         assert_eq!(overlaps, 4)
     }
 }
