@@ -412,37 +412,37 @@ mod tests {
 
     #[test]
     fn test_day2_1() {
-        let score = rock_paper_scissors("./data/day2test.txt");
+        let score = rock_paper_scissors("./tests/day2.txt");
 
         assert_eq!(score, 15)
     }
     #[test]
     fn test_day2_2() {
-        let score = rock_paper_scissors2("./data/day2test.txt");
+        let score = rock_paper_scissors2("./tests/day2.txt");
 
         assert_eq!(score, 12)
     }
 
     #[test]
     fn test_day3_1() {
-        let priority_sum = rucksack_sorting("./data/day3test.txt");
+        let priority_sum = rucksack_sorting("./tests/day3.txt");
 
         assert_eq!(priority_sum, 157)
     }
     #[test]
     fn test_day3_2() {
-        let priority_sum = rucksack_badge_search("./data/day3test.txt");
+        let priority_sum = rucksack_badge_search("./tests/day3.txt");
 
         assert_eq!(priority_sum, 70)
     }
     #[test]
     fn test_day4_1() {
-        let overlaps = find_complete_overlaps("./data/day4test.txt");
+        let overlaps = find_complete_overlaps("./tests/day4.txt");
         assert_eq!(overlaps, 2)
     }
     #[test]
     fn test_day4_2() {
-        let overlaps = find_partial_overlaps("./data/day4test.txt");
+        let overlaps = find_partial_overlaps("./tests/day4.txt");
         assert_eq!(overlaps, 4)
     }
 }
