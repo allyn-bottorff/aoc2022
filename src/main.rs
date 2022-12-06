@@ -11,6 +11,12 @@ enum RPSChoice {
     Scissors,
 }
 
+struct CraneMoves {
+    quantity: Vec<usize>,
+    source: Vec<usize>,
+    destination: Vec<usize>,
+}
+
 /// Read lines from a file
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
@@ -385,6 +391,53 @@ fn find_partial_overlaps(file: &str) -> i32 {
     return overlaps;
 }
 
+fn read_crane_data(file: &str) -> (Vec<String>, Vec<String>) {
+    let mut state_lines: Vec<String> = Vec::new();
+    let mut proc_lines: Vec<String> = Vec::new();
+    let mut end_of_state: bool = false;
+    if let Ok(lines) = read_lines(file) {
+        for line in lines {
+            let line_string = line.unwrap();
+            if line_string == String::from("") {
+                end_of_state = true;
+                continue;
+            }
+            if !end_of_state {
+                state_lines.push(line_string);
+            } else {
+                proc_lines.push(line_string);
+            }
+        }
+    }
+
+    // println!("state: {:?}", state_lines);
+    // println!("procedure: {:?}", proc_lines);
+
+    (state_lines, proc_lines)
+}
+
+fn parse_crane_state(state_lines: Vec<String>) -> Vec<Vec<char>> {
+    let last_string = state_lines.last().unwrap();
+    let last_str = last_string.as_str();
+    let trimmed = last_str.trim();
+    let last_char = String::from(trimmed).pop().unwrap();
+    let num_of_piles: usize = last_char.to_digit(10).unwrap().try_into().unwrap();
+
+    let piles: Vec<Vec<char>> = Vec::with_capacity(num_of_piles);
+
+    piles
+}
+
+fn parse_crane_proc(proc_lines: Vec<String>) -> CraneMoves {
+    let program = CraneMoves {
+        quantity: Vec::new(),
+        source: Vec::new(),
+        destination: Vec::new(),
+    };
+
+    program
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -399,6 +452,7 @@ fn main() {
             "d3-2" => _ = rucksack_badge_search("./data/day3.txt"),
             "d4" => _ = find_complete_overlaps("./data/day4.txt"),
             "d4-2" => _ = find_partial_overlaps("./data/day4.txt"),
+            "d5" => _ = read_crane_data("./data/day5.txt"),
             _ => println!("Unrecognized command."),
         }
     } else {
@@ -444,5 +498,11 @@ mod tests {
     fn test_day4_2() {
         let overlaps = find_partial_overlaps("./tests/day4.txt");
         assert_eq!(overlaps, 4)
+    }
+    #[test]
+    fn test_day5_parse() {
+        let (conf, proc) = read_crane_data("./tests/day5.txt");
+        assert_eq!(conf.len(), 4);
+        assert_eq!(proc.len(), 4);
     }
 }
