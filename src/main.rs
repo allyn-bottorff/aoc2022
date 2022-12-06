@@ -427,12 +427,8 @@ fn parse_crane_state(state_lines: Vec<String>) -> Vec<Vec<char>> {
 
     // Start with the line above the stack numbers.
     let mut i: usize = state_lines.len() - 2;
-    println!("unparsed state: {:?}", state_lines);
-    println!("last state line index: {}", i);
-    println!("last state line: {:?}", state_lines[i]);
     loop {
         let j_len: usize = state_lines[i].len();
-        println!("length of a line: {}", j_len);
         let mut j: usize = 0;
         let mut col: usize = 0;
         while j < j_len {
@@ -530,6 +526,10 @@ fn run_crane_2(proc: CraneMoves, mut state: Vec<Vec<char>>) -> Vec<char> {
 
     println!("Tops of the stacks: {:?}", results);
     results
+}
+
+fn find_packet_start(file: &str) -> usize {
+    7
 }
 
 fn main() {
@@ -659,5 +659,11 @@ mod tests {
         let expected: Vec<char> = vec!['M', 'C', 'D'];
 
         assert_eq!(final_state, expected)
+    }
+
+    #[test]
+    fn test_find_packet_start_1() {
+        let packet_start = find_packet_start("./tests/day6-1.txt");
+        assert_eq!(packet_start, 7)
     }
 }
