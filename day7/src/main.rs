@@ -121,14 +121,18 @@ fn process_file(file: &str) -> ArenaTree<String> {
     tree
 }
 
-fn get_recursive_dir_size(tree: &ArenaTree<String>, directory: usize, starting_size: i32) -> i32 {
-    let mut total_size: i32 = starting_size;
-    for file_size in &tree.arena[directory].files {
-        total_size += file_size;
-    }
+fn get_recursive_dir_size(tree: &ArenaTree<String>, directory: usize) -> i32 {
+    let mut total_size: i32 = 0;
+    let mut children: Vec<usize> = Vec::new();
 
-    for dir in &tree.arena[directory].children {
-        total_size += get_recursive_dir_size(&tree, *dir, total_size)
+    for file in &tree.arena[directory].files {
+        total_size += *file;
+    }
+    children = tree.get_children(directory, &mut children).to_vec();
+    for child in children {
+        for file in &tree.arena[child].files {
+            total_size += *file;
+        }
     }
 
     total_size
@@ -165,9 +169,15 @@ fn parse_line(line: String) -> LineType {
 fn main() {
     println!("Hello, world!");
 
-    let fs_tree = process_file("./day7.txy");
-    let _total_size = get_total_size(&fs_tree);
-    let _some_size = get_recursive_dir_size(&fs_tree, 0, 0);
+    let fs_tree = process_file("./day7.txt");
+
+    println!("{}", get_total_size(&fs_tree));
+    println!("{}", get_recursive_dir_size(&fs_tree, 0));
+
+    // for dir in &fs_tree.arena {
+    //     let dir_size = get_recursive_dir_size(&fs_tree, dir.index);
+    //     println!("Directory name: {:?} size: {:?}", dir.val, dir_size)
+    // }
 }
 
 #[cfg(test)]
@@ -178,6 +188,13 @@ mod tests {
     fn test_get_root_size() {
         let fs_tree = process_file("./tests/day7.txt");
         let total_size = get_total_size(&fs_tree);
+        assert_eq!(total_size, 48381165)
+    }
+
+    #[test]
+    fn test_get_recursive_sizze() {
+        let fs_tree = process_file("./tests/day7.txt");
+        let total_size = get_recursive_dir_size(&fs_tree, 0);
         assert_eq!(total_size, 48381165)
     }
 
