@@ -227,7 +227,9 @@ fn main() {
     let mut at_most_100k_dirs: Vec<i32> = Vec::new();
     let mut frees_enough_space_dirs: Vec<i32> = Vec::new();
 
-    let required_space_to_free: i32 = 70000000 - get_total_size(&fs_tree);
+    let current_free_space: i32 = 70000000 - get_total_size(&fs_tree);
+
+    let required_space_to_free: i32 = 30000000 - current_free_space;
 
     for dir in &fs_tree.arena {
         let dir_size = get_recursive_dir_size(&fs_tree, dir.index);
