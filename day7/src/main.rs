@@ -19,22 +19,22 @@ impl ArenaTree {
         index
     }
 
-    fn get_full_path_prefix(&self, starting_index: usize) -> String {
-        let mut names: Vec<&str> = Vec::new();
-        let mut node: usize = starting_index;
-        let mut full_path: String = String::from("");
-        loop {
-            names.push(&self.arena[node].val);
-            node = match &self.arena[node].parent {
-                Some(node) => *node,
-                None => break,
-            };
-        }
-        for name in names {
-            full_path = format!("{}{}", full_path, name);
-        }
-        full_path
-    }
+    // fn get_full_path_prefix(&self, starting_index: usize) -> String {
+    //     let mut names: Vec<&str> = Vec::new();
+    //     let mut node: usize = starting_index;
+    //     let mut full_path: String = String::from("");
+    //     loop {
+    //         names.push(&self.arena[node].val);
+    //         node = match &self.arena[node].parent {
+    //             Some(node) => *node,
+    //             None => break,
+    //         };
+    //     }
+    //     for name in names {
+    //         full_path = format!("{}{}", full_path, name);
+    //     }
+    //     full_path
+    // }
 
     fn get_children(&self, starting_index: usize) -> Vec<usize> {
         let mut all_children: Vec<usize> = Vec::new();
@@ -213,8 +213,8 @@ fn main() {
 
     let children = fs_tree.get_children(0);
 
-    let full_path = fs_tree.get_full_path_prefix(10);
-    println!("full path from node index 10: {}", full_path);
+    // let full_path = fs_tree.get_full_path_prefix(10);
+    // println!("full path from node index 10: {}", full_path);
 
     println!("total child dirs: {}", children.len());
     let total_size: i32 = get_total_size(&fs_tree);
@@ -289,12 +289,12 @@ mod tests {
         assert_eq!(children.sort(), vec![1, 2, 3].sort())
     }
 
-    #[test]
-    fn test_full_path() {
-        let fs_tree = process_file("./tests/day7.txt");
-        let full_path = fs_tree.get_full_path_prefix(3);
-        println!("full path? {}", full_path);
-    }
+    // #[test]
+    // fn test_full_path() {
+    //     let fs_tree = process_file("./tests/day7.txt");
+    //     let full_path = fs_tree.get_full_path_prefix(3);
+    //     println!("full path? {}", full_path);
+    // }
 
     // #[test]
     // fn test_recursive_dir_size() {
