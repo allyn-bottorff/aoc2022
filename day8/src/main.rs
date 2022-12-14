@@ -131,7 +131,7 @@ fn get_scenic_scores(grid: &Vec<Vec<(u8, bool)>>) -> Vec<i32> {
             let tree_height = grid[row_count][col_count].0;
 
             let mut right_count: i32 = 0;
-            for height in grid[row_count][col_count..col_max - 1].into_iter() {
+            for height in grid[row_count][col_count + 1..col_max].into_iter() {
                 if height.0 < tree_height {
                     right_count += 1;
                 } else {
@@ -151,19 +151,19 @@ fn get_scenic_scores(grid: &Vec<Vec<(u8, bool)>>) -> Vec<i32> {
             }
 
             let mut down_count: i32 = 0;
-            for row in grid[row_count..row_max - 1].into_iter() {
-                for height in row[col_count] {
-                    if height.0 < tree_height {
-                        down_count += 1;
-                    } else {
-                        down_count += 1;
-                        break;
-                    }
+            for row in grid[row_count + 1..row_max].into_iter() {
+                let height = row[col_count];
+                if height.0 < tree_height {
+                    down_count += 1;
+                } else {
+                    down_count += 1;
+                    break;
                 }
             }
 
             let mut up_count: i32 = 0;
-            for height in grid[0..row_count][col_count].into_iter().rev() {
+            for row in grid[0..row_count].into_iter().rev() {
+                let height = row[col_count];
                 if height.0 < tree_height {
                     up_count += 1;
                 } else {
@@ -199,6 +199,19 @@ fn main() {
     let tree_count = count_visible(&grid);
     println!("Visible trees: {}", tree_count);
 
+    let scenic_scores = get_scenic_scores(&grid);
+    let mut max_score: i32 = 0;
+    for score in scenic_scores {
+        if score > max_score {
+            max_score = score;
+        }
+    }
+    println!("Max scenic score: {}", max_score);
+
+    // let test_grid = process_file("./tests/day8.txt");
+    // let test_scores = get_scenic_scores(&test_grid);
+    // println!("Scenic scores: {:?}", test_scores);
+
     // println!("{:?}", grid);
     // for line in grid {
     //     println!("{:?}", line);
@@ -219,5 +232,19 @@ mod test {
         let tree_count = count_visible(&grid);
 
         assert_eq!(21, tree_count)
+    }
+
+    #[test]
+    fn test_get_highest_scenic_score() {
+        let mut grid = process_file("./tests/day8.txt");
+        let scores = get_scenic_scores(&grid);
+        let mut max_score: i32 = 0;
+        for score in scores {
+            if score > max_score {
+                max_score = score;
+            }
+        }
+
+        assert_eq!(max_score, 8)
     }
 }
