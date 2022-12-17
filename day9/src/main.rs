@@ -26,6 +26,7 @@ fn process_file(file: &str) -> Vec<Coord> {
     let mut head: Coord = Coord { x: 0, y: 0 };
     let mut tail: Coord = Coord { x: 0, y: 0 };
     let mut tail_locations: Vec<Coord> = Vec::new();
+    tail_locations.push(tail);
     let lines = read_lines(file).unwrap();
     for line_result in lines {
         let line = line_result.unwrap();
@@ -33,8 +34,8 @@ fn process_file(file: &str) -> Vec<Coord> {
         let direction = line_vec.0.parse::<char>().unwrap();
         let val = line_vec.1.parse::<i32>().unwrap();
 
-        let mut i: i32 = 0;
-        while i < val {
+        let mut i: i32 = 1;
+        while i <= val {
             let prev_head = head.clone();
             match direction {
                 'R' => head.x += 1,
@@ -53,30 +54,30 @@ fn process_file(file: &str) -> Vec<Coord> {
     tail_locations
 }
 
-fn number_of_unique_locations(locations: Vec<Coord>) -> i32 {
-    let mut i: usize = 0;
-    let mut j: usize = 0;
-    let mut duplicate_count: i32 = 0;
-    let location_max: usize = locations.len();
-    while i < location_max {
-        while j < location_max {
-            if i != j && locations[i] == locations[j] {
-                duplicate_count += 1;
+fn number_of_unique_locations(locations: &Vec<Coord>) -> i32 {
+    let mut unique_coords: Vec<Coord> = Vec::new();
+
+    'outer: for coord in locations {
+        let mut i: usize = 0;
+        while i < unique_coords.len() {
+            if *coord == unique_coords[i] {
+                continue 'outer;
             }
-            j += 1;
+            i += 1;
         }
-        i += 1;
+        unique_coords.push(*coord);
     }
-    location_max as i32 - duplicate_count
+
+    unique_coords.len() as i32
 }
 
 /// Determine if points are within one unit of each other, including diagonal
 fn is_adjacent(p1: &Coord, p2: &Coord) -> bool {
-    if p1.x - p2.x > 1 || p1.x - p2.x < -1 {
+    if p1.x - p2.x > 1 || p2.x - p1.x > 1 {
         return false;
     }
 
-    if p1.y - p2.y > 1 || p1.y - p2.y < -1 {
+    if p1.y - p2.y > 1 || p2.y - p1.y > 1 {
         return false;
     }
 
@@ -85,7 +86,7 @@ fn is_adjacent(p1: &Coord, p2: &Coord) -> bool {
 
 fn main() {
     let tail_locs = process_file("./day9.txt");
-    let unique_tail_locs = number_of_unique_locations(tail_locs);
+    let unique_tail_locs = number_of_unique_locations(&tail_locs);
 
     println!("Unique tail locations: {}", unique_tail_locs);
 }
@@ -98,14 +99,14 @@ mod test {
 
     #[test]
     fn test_adjacent_diagonal() {
-        let p1 = Coord { x: 5, y: 5 };
-        let p2 = Coord { x: 6, y: 6 };
+        let p1 = Coord { x: 6, y: 6 };
+        let p2 = Coord { x: 5, y: 5 };
         assert_eq!(true, is_adjacent(&p1, &p2))
     }
     #[test]
     fn test_adjacent() {
-        let p1 = Coord { x: 5, y: 5 };
-        let p2 = Coord { x: 6, y: 5 };
+        let p1 = Coord { x: 6, y: 5 };
+        let p2 = Coord { x: 5, y: 5 };
         assert_eq!(true, is_adjacent(&p1, &p2))
     }
     #[test]
@@ -117,7 +118,7 @@ mod test {
     #[test]
     fn test_unique_locations() {
         let tail_locs = process_file("./tests/day9.txt");
-        let tail_count = number_of_unique_locations(tail_locs);
+        let tail_count = number_of_unique_locations(&tail_locs);
 
         assert_eq!(tail_count, 13);
     }
