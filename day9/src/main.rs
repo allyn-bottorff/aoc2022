@@ -54,6 +54,55 @@ fn process_file(file: &str) -> Vec<Coord> {
     tail_locations
 }
 
+fn process_file_pt2(file: &str) -> Vec<Coord> {
+    let mut rope: Vec<Coord> = Vec::new();
+    let mut i: usize = 0;
+
+    while i < 9 {
+        rope.push(Coord { x: 0, y: 0 });
+        i += 1;
+    }
+
+    let mut tail_locations: Vec<Coord> = Vec::new();
+    tail_locations.push(rope[0]);
+    let lines = read_lines(file).unwrap();
+    for line_result in lines {
+        let line = line_result.unwrap();
+        let line_vec = line.split_once(' ').unwrap();
+        let direction = line_vec.0.parse::<char>().unwrap();
+        let val = line_vec.1.parse::<i32>().unwrap();
+
+        let mut i: i32 = 1;
+        while i <= val {
+            let prev_head = rope[0].clone();
+            match direction {
+                'R' => rope[0].x += 1,
+                'L' => rope[0].x += -1,
+                'U' => rope[0].y += 1,
+                'D' => rope[0].y += -1,
+                _ => panic!(),
+            }
+
+            let mut k: usize = 0;
+            let mut temp_knot = prev_head;
+            while k < rope.len() - 1 {
+                if !is_adjacent(&rope[k], &rope[k + 1]) {
+                    let temp_knot2 = rope[k + 1].clone();
+                    rope[k + 1] = temp_knot.clone();
+                    temp_knot = temp_knot2.clone();
+                    if k + 1 == 8 {
+                        tail_locations.push(rope[k + 1]);
+                    }
+                }
+
+                k += 1;
+            }
+            i += 1;
+        }
+    }
+    tail_locations
+}
+
 fn number_of_unique_locations(locations: &Vec<Coord>) -> i32 {
     let mut unique_coords: Vec<Coord> = Vec::new();
 
@@ -121,5 +170,12 @@ mod test {
         let tail_count = number_of_unique_locations(&tail_locs);
 
         assert_eq!(tail_count, 13);
+    }
+    #[test]
+    fn test_unique_locations2() {
+        let tail_locs = process_file_pt2("./tests/day9-2.txt");
+        let tail_count = number_of_unique_locations(&tail_locs);
+
+        assert_eq!(tail_count, 36);
     }
 }
