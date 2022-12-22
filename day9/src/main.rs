@@ -58,7 +58,7 @@ fn process_file_pt2(file: &str) -> Vec<Coord> {
     let mut rope: Vec<Coord> = Vec::new();
     let mut i: usize = 0;
 
-    while i < 9 {
+    while i < 10 {
         rope.push(Coord { x: 0, y: 0 });
         i += 1;
     }
@@ -74,7 +74,6 @@ fn process_file_pt2(file: &str) -> Vec<Coord> {
 
         let mut i: i32 = 1;
         while i <= val {
-            let prev_head = rope[0].clone();
             match direction {
                 'R' => rope[0].x += 1,
                 'L' => rope[0].x += -1,
@@ -84,13 +83,36 @@ fn process_file_pt2(file: &str) -> Vec<Coord> {
             }
 
             let mut k: usize = 0;
-            let mut temp_knot = prev_head;
             while k < rope.len() - 1 {
                 if !is_adjacent(&rope[k], &rope[k + 1]) {
-                    let temp_knot2 = rope[k + 1].clone();
-                    rope[k + 1] = temp_knot.clone();
-                    temp_knot = temp_knot2.clone();
-                    if k + 1 == 8 {
+                    if rope[k].x == rope[k + 1].x {
+                        // same x, move vertically
+                        if rope[k].y > rope[k + 1].y {
+                            rope[k + 1].y += 1;
+                        } else {
+                            rope[k + 1].y -= 1;
+                        }
+                    } else if rope[k].y == rope[k + 1].y {
+                        // same y, move horizontall
+                        if rope[k].x > rope[k + 1].x {
+                            rope[k + 1].x += 1;
+                        } else {
+                            rope[k + 1].x -= 1;
+                        }
+                    } else {
+                        // diagonal moves
+                        if rope[k].x > rope[k + 1].x {
+                            rope[k + 1].x += 1;
+                        } else {
+                            rope[k + 1].x -= 1;
+                        }
+                        if rope[k].y > rope[k + 1].y {
+                            rope[k + 1].y += 1;
+                        } else {
+                            rope[k + 1].y -= 1;
+                        }
+                    }
+                    if k + 1 == rope.len() - 1 {
                         tail_locations.push(rope[k + 1]);
                     }
                 }
@@ -135,9 +157,12 @@ fn is_adjacent(p1: &Coord, p2: &Coord) -> bool {
 
 fn main() {
     let tail_locs = process_file("./day9.txt");
+    let tail_locs_pt2 = process_file_pt2("./day9.txt");
     let unique_tail_locs = number_of_unique_locations(&tail_locs);
+    let unique_tail_locs_pt2 = number_of_unique_locations(&tail_locs_pt2);
 
-    println!("Unique tail locations: {}", unique_tail_locs);
+    println!("Unique tail locations part 1: {}", unique_tail_locs);
+    println!("Unique tail locations part 2: {}", unique_tail_locs_pt2);
 }
 
 #[cfg(test)]
@@ -175,6 +200,7 @@ mod test {
     fn test_unique_locations2() {
         let tail_locs = process_file_pt2("./tests/day9-2.txt");
         let tail_count = number_of_unique_locations(&tail_locs);
+        println!("day 2 tail locations: {:?}", tail_locs);
 
         assert_eq!(tail_count, 36);
     }
