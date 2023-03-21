@@ -2,6 +2,8 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+use num::bigint::{BigInt, ToBigInt};
+
 struct Monkey {
     items: Vec<i64>,
     true_dest: usize,
@@ -125,6 +127,26 @@ fn parse_op(item: i64, op_string: &Vec<String>) -> i64 {
 
     new_val
 }
+fn parse_op_pt2(item_tuple: &mut (BigInt, usize), op_string: &Vec<String>) {
+    
+
+    let left = match op_string[2].as_str() {
+        "old" => item_tuple.0.clone(),
+        _ =>  BigInt::from(0),
+    };
+
+    let right = match op_string[4].as_str() {
+        "old" => item_tuple.0.clone(),
+        _ => op_string[4].parse::<i32>().unwrap().to_bigint().unwrap(),
+    };
+
+    item_tuple.0 = match op_string[3].as_str() {
+        "+" => left + right,
+        "*" => left * right,
+        _ => panic!(),
+    };
+
+}
 
 fn process_monkeys(monkeys: &mut Vec<Monkey>, rounds: u32) {
     for _round in 0..rounds {
@@ -151,24 +173,30 @@ fn process_monkeys(monkeys: &mut Vec<Monkey>, rounds: u32) {
 }
 
 fn process_monkeys_pt2(monkeys: &mut Vec<Monkey>, rounds: u32) {
+    let mut items: Vec<(BigInt, usize)> = Vec::new(); //store the items in their own vector and
+                                                      //reference monkeys
+
+    for m_idx in 0..monkeys.len() {
+        for i_idx in 0..monkeys[m_idx].items.len() {
+            items.push((BigInt::from(monkeys[m_idx].items[i_idx]), m_idx));
+        }
+    }
+
     for _round in 0..rounds {
         for m_idx in 0..monkeys.len() {
-            let mut true_temp_items = Vec::new();
-            let mut false_temp_items = Vec::new();
-            for i_idx in 0..monkeys[m_idx].items.len() {
-                monkeys[m_idx].items_inspected += 1;
-                let worry = parse_op(monkeys[m_idx].items[i_idx], &monkeys[m_idx].operation);
-                if worry % monkeys[m_idx].test_div == 0 {
-                    true_temp_items.push(worry);
-                } else {
-                    false_temp_items.push(worry);
+            for i in 0..items.len() {
+                if items[i].1 == m_idx{
+                    parse_op_pt2(&mut items[i], &monkeys[m_idx].operation);
+                    if &items[i].0 % monkeys[m_idx].test_div.to_bigint().unwrap() == BigInt::from(0) {
+                        items[i].1 = monkeys[m_idx].true_dest;
+                    } else {
+                        items[i].1 = monkeys[m_idx].false_dest;
+                    }
+                    monkeys[m_idx].items_inspected += 1;
+
                 }
             }
-            let true_dest = monkeys[m_idx].true_dest;
-            let false_dest = monkeys[m_idx].false_dest;
-            monkeys[true_dest].items.extend(true_temp_items);
-            monkeys[false_dest].items.extend(false_temp_items);
-            monkeys[m_idx].items.clear();
+            
         }
     }
 }
@@ -190,7 +218,7 @@ fn get_monkey_business(monkeys: &Vec<Monkey>) -> i32 {
 fn main() {
     let mut monkeys = process_file("./day11.txt");
 
-    process_monkeys(&mut monkeys, 20);
+    process_monkeys_pt2(&mut monkeys, 20);
 
     let monkey_business = get_monkey_business(&monkeys);
 
