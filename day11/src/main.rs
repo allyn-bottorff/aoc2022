@@ -3,11 +3,12 @@ use std::io::{self, BufRead};
 use std::path::Path;
 
 struct Monkey {
-    items: Vec<i32>,
-    true_dest: i32,
-    false_dest: i32,
+    items: Vec<i64>,
+    true_dest: usize,
+    false_dest: usize,
     operation: Vec<String>,
-    test_div: i32,
+    test_div: i64,
+    items_inspected: i32,
 }
 impl Monkey {
     fn new() -> Self {
@@ -17,8 +18,19 @@ impl Monkey {
             operation: vec![String::from("")],
             items: vec![0],
             test_div: 1,
+            items_inspected: 0,
         }
     }
+
+    // fn print(&self, idx: usize) {
+    //     println!("Monkey {}:", idx);
+    //     println!("  Items: {:?}", self.items);
+    //     println!("  True dest: {}", self.true_dest);
+    //     println!("  False dest: {}", self.false_dest);
+    //     println!("  Operation: {:?}", self.operation);
+    //     println!("  Test division: {}", self.test_div);
+    //     println!("  Items inspected: {}", self.items_inspected);
+    // }
 }
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
@@ -29,9 +41,7 @@ where
     Ok(io::BufReader::new(file).lines())
 }
 
-
-
-fn process_file(filename: &str) -> Vec<Monkey>{
+fn process_file(filename: &str) -> Vec<Monkey> {
     let mut monkeys: Vec<Monkey> = Vec::new();
 
     let lines = read_lines(filename).unwrap();
@@ -44,57 +54,59 @@ fn process_file(filename: &str) -> Vec<Monkey>{
             continue;
         }
 
-        match line_vec[0]{
+        match line_vec[0] {
             "Monkey" => {
                 monkeys.push(Monkey::new());
                 continue;
             }
-            "Starting" => { 
-
+            "Starting" => {
                 //get ready for some messy functional chaos
-                monkeys.last_mut().unwrap().items = line_vec[2..].into_iter().map(|x| {
-                    if x.ends_with(",") {
-                       x[..x.len()-1].parse::<i32>().unwrap() 
-                    } else {
-                        x.parse::<i32>().unwrap()
-                    }
-
-                }).collect();
+                monkeys.last_mut().unwrap().items = line_vec[2..]
+                    .into_iter()
+                    .map(|x| {
+                        if x.ends_with(",") {
+                            x[..x.len() - 1].parse::<i64>().unwrap()
+                        } else {
+                            x.parse::<i64>().unwrap()
+                        }
+                    })
+                    .collect();
                 continue;
             }
             "Operation:" => {
-                monkeys.last_mut().unwrap().operation = line_vec[1..].into_iter().map(|x| String::from(*x)).collect(); //verbose magic functional nonsense :)
-
+                monkeys.last_mut().unwrap().operation = line_vec[1..]
+                    .into_iter()
+                    .map(|x| String::from(*x))
+                    .collect(); //verbose magic functional nonsense :)
             }
-            "Test" => {
+            "Test:" => {
                 monkeys.last_mut().unwrap().test_div = line_vec.last().unwrap().parse().unwrap();
-
             }
-            "If" => {
-                match line_vec[1] {
-                    "true:" => {
-                        monkeys.last_mut().unwrap().true_dest = line_vec.last().unwrap().parse().unwrap();
-                        continue;
-                    }
-                    "false:" =>  {
-                        monkeys.last_mut().unwrap().false_dest = line_vec.last().unwrap().parse().unwrap();
-                        continue;
-                    }
-                    _ => {
-                        continue;
-                    }
+            "If" => match line_vec[1] {
+                "true:" => {
+                    monkeys.last_mut().unwrap().true_dest =
+                        line_vec.last().unwrap().parse().unwrap();
+                    continue;
                 }
+                "false:" => {
+                    monkeys.last_mut().unwrap().false_dest =
+                        line_vec.last().unwrap().parse().unwrap();
+                    continue;
+                }
+                _ => {
+                    continue;
+                }
+            },
+            _ => {
+                continue;
             }
-            _ => { continue; }
         }
     }
 
     monkeys
 }
 
-
-fn parse_op(item: i32, op_string: Vec<String>) -> i32 {
-
+fn parse_op(item: i64, op_string: &Vec<String>) -> i64 {
     let left = match op_string[2].as_str() {
         "old" => item,
         _ => 0,
@@ -111,76 +123,92 @@ fn parse_op(item: i32, op_string: Vec<String>) -> i32 {
         _ => panic!(),
     };
 
-
     new_val
-
-
-
 }
 
-// fn process_file(filename: &str) {
-//     let mut monkeys: Vec<Monkey> = Vec::new();
-//     let lines = read_lines(filename);
-//
-//
-//     let mut starting_items: Vec<i32> = Vec::new();
-//     let mut operation: fn(i32, i32) -> i32  = add_two;
-//     let mut test: fn(i32) -> bool = |x: i32| -> bool {true};
-//     let mut true_dest: usize = 0;
-//     let mut false_dest: usize = 0;
-//     let mut op_const: i32 = 0;
-//     for line_result in lines.unwrap() {
-//         let line_string = line_result.unwrap();
-//         let line_vec: Vec<&str> = line_string.split_whitespace().collect();
-//         println!("{:?}", line_vec);
-//         if line_vec.len() == 0 {
-//             continue;
-//         }
-//
-//         match line_vec[0] {
-//             "Monkey" => continue,
-//             "Starting" => {
-//                 for item in line_vec {
-//                     let num_result = item.parse::<i32>();
-//                     match num_result {
-//                         Ok(x) => {
-//                             starting_items.push(x);
-//                         }
-//                         Err(_) => {}
-//                     }
-//                 }
-//             }
-//             "Operation:" =>  {
-//             match line_vec[4] {
-//                             // "+" => operation = |x: i32, x: i32| -> i32 {x + x},
-//                             // "-" => operation = |x: i32| -> i32 {x - x},
-//                             // "*" => operation = |x: i32| -> i32 {x * x},
-//                             "+" => operation = add_two,
-//                             "-" => operation = |x: i32| -> i32 {x - x},
-//                             "*" => operation = |x: i32| -> i32 {x * x},
-//
-//             }
-//         }
-//
-//                     }
-//                 }
-//                 }
-//             
-            
 
 fn main() {
-    println!("Hello, world!");
-    let monkeys = process_file("./tests/day11.txt");
+    let mut monkeys = process_file("./day11.txt");
 
-    for (i, monkey) in monkeys.iter().enumerate() {
-        println!("Monkey: {}", i);
-        println!("  Starting items: {:?}", monkey.items);
-        println!("  Operation: {:?}", monkey.operation);
-        println!("  Test divisor: {}", monkey.test_div); 
-        println!("    True dest: {}", monkey.true_dest);
-        println!("    False dest: {}", monkey.false_dest);
-    }
+    // for (i, monkey) in monkeys.iter().enumerate() {
+    //     println!("Monkey: {}", i);
+    //     println!("  Starting items: {:?}", monkey.items);
+    //     println!("  Operation: {:?}", monkey.operation);
+    //     println!("  Test divisor: {}", monkey.test_div);
+    //     println!("    True dest: {}", monkey.true_dest);
+    //     println!("    False dest: {}", monkey.false_dest);
+    // }
+    //
+
+    // for _round in 0..20 {
+    //     for m_idx in 0..monkeys.len() {
+    //         let mut true_temp_items = Vec::new();
+    //         let mut false_temp_items = Vec::new();
+    //         for i_idx in 0..monkeys[m_idx].items.len() {
+    //             monkeys[m_idx].items_inspected += 1;
+    //             let mut worry = parse_op(monkeys[m_idx].items[i_idx], &monkeys[m_idx].operation);
+    //             worry = worry / 3;
+    //             if worry % monkeys[m_idx].test_div == 0 {
+    //                 true_temp_items.push(worry);
+    //             } else {
+    //                 false_temp_items.push(worry);
+    //             }
+    //         }
+    //         let true_dest = monkeys[m_idx].true_dest;
+    //         let false_dest = monkeys[m_idx].false_dest;
+    //         monkeys[true_dest].items.extend(true_temp_items);
+    //         monkeys[false_dest].items.extend(false_temp_items);
+    //         monkeys[m_idx].items.clear();
+    //     }
+    // }
+
+    // let mut inspected: Vec<(usize, i32)> = Vec::new();
     
+    process_monkeys(&mut monkeys, 20);
+
+    let monkey_business = get_monkey_business(&monkeys);
+
+    println!("monkey business: {}", monkey_business);
+}
+
+
+fn process_monkeys(monkeys: &mut Vec<Monkey>, rounds: u32) {
+    for _round in 0..rounds {
+        for m_idx in 0..monkeys.len() {
+            let mut true_temp_items = Vec::new();
+            let mut false_temp_items = Vec::new();
+            for i_idx in 0..monkeys[m_idx].items.len() {
+                monkeys[m_idx].items_inspected += 1;
+                let mut worry = parse_op(monkeys[m_idx].items[i_idx], &monkeys[m_idx].operation);
+                worry = worry / 3;
+                if worry % monkeys[m_idx].test_div == 0 {
+                    true_temp_items.push(worry);
+                } else {
+                    false_temp_items.push(worry);
+                }
+            }
+            let true_dest = monkeys[m_idx].true_dest;
+            let false_dest = monkeys[m_idx].false_dest;
+            monkeys[true_dest].items.extend(true_temp_items);
+            monkeys[false_dest].items.extend(false_temp_items);
+            monkeys[m_idx].items.clear();
+        }
+    }
+}
+
+
+fn get_monkey_business(monkeys: &Vec<Monkey>) -> i32 {
+    let mut inspected: Vec<i32> = Vec::new();
+
+    for m in monkeys {
+        inspected.push(m.items_inspected);
+    }
+
+    inspected.sort();
+    let first = inspected.pop().unwrap();
+    let second = inspected.pop().unwrap();
+
+    first * second
 }
 
 #[cfg(test)]
@@ -191,35 +219,83 @@ mod test {
 
     #[test]
     fn test_add_single_op() {
-        let op_string = vec![String::from("new"), String::from("="), String::from("old"), String::from("+"), String::from("4")];
-        let initial: i32 = 10;
-        let expected: i32 = 14; 
+        let op_string = vec![
+            String::from("new"),
+            String::from("="),
+            String::from("old"),
+            String::from("+"),
+            String::from("4"),
+        ];
+        let initial: i64 = 10;
+        let expected: i64 = 14;
 
-        let result = parse_op(initial, op_string);
-
+        let result = parse_op(initial, &op_string);
 
         assert_eq!(expected, result)
     }
     #[test]
     fn test_mult_self_op() {
-        let op_string = vec![String::from("new"), String::from("="), String::from("old"), String::from("*"), String::from("old")];
-        let initial: i32 = 10;
-        let expected: i32 = 100; 
+        let op_string = vec![
+            String::from("new"),
+            String::from("="),
+            String::from("old"),
+            String::from("*"),
+            String::from("old"),
+        ];
+        let initial: i64 = 10;
+        let expected: i64 = 100;
 
-        let result = parse_op(initial, op_string);
-
+        let result = parse_op(initial, &op_string);
 
         assert_eq!(expected, result)
     }
     #[test]
     fn test_mult_other_op() {
-        let op_string = vec![String::from("new"), String::from("="), String::from("old"), String::from("*"), String::from("4")];
-        let initial: i32 = 10;
-        let expected: i32 = 40; 
+        let op_string = vec![
+            String::from("new"),
+            String::from("="),
+            String::from("old"),
+            String::from("*"),
+            String::from("4"),
+        ];
+        let initial: i64 = 10;
+        let expected: i64 = 40;
 
-        let result = parse_op(initial, op_string);
-
+        let result = parse_op(initial, &op_string);
 
         assert_eq!(expected, result)
+    }
+
+    #[test]
+    fn test_one_round() {
+        let mut monkeys = process_file("./tests/day11.txt");
+
+        // println!("Monkey initial state:");
+        // for (i,m) in monkeys.iter().enumerate() {
+        //     m.print(i)
+        // }
+        process_monkeys(&mut monkeys, 1);
+        let mut test_monkey_items: Vec<Vec<i64>> = Vec::new();
+
+        test_monkey_items.push(vec![20,23,27,26]);
+        test_monkey_items.push(vec![2080,25,167,207,401,1046]);
+        test_monkey_items.push(Vec::new());
+        test_monkey_items.push(Vec::new());
+
+
+        for (i, m) in monkeys.iter().enumerate() {
+            assert_eq!(m.items, test_monkey_items[i])
+        }
+    }
+
+    #[test]
+    fn test_overall_monkey_business() {
+        let mut monkeys = process_file("./tests/day11.txt");
+        process_monkeys(&mut monkeys, 20);
+        let monkey_business = get_monkey_business(&monkeys);
+
+        assert_eq!(monkey_business, 10605);
+
+
     }
 }
