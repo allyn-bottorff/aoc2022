@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+use num::ToPrimitive;
 use num::bigint::{BigInt, ToBigInt};
 
 struct Monkey {
@@ -175,17 +176,21 @@ fn process_monkeys(monkeys: &mut Vec<Monkey>, rounds: u32) {
 fn process_monkeys_pt2(monkeys: &mut Vec<Monkey>, rounds: u32) {
     let mut items: Vec<(BigInt, usize)> = Vec::new(); //store the items in their own vector and
                                                       //reference monkeys
-
+    let mut supermod = 1;
     for m_idx in 0..monkeys.len() {
         for i_idx in 0..monkeys[m_idx].items.len() {
             items.push((BigInt::from(monkeys[m_idx].items[i_idx]), m_idx));
         }
+        supermod = supermod * monkeys[m_idx].test_div;
     }
 
     for _round in 0..rounds {
         for m_idx in 0..monkeys.len() {
             for i in 0..items.len() {
                 if items[i].1 == m_idx{
+
+                    items[i].0 = items[i].0.clone() % supermod;
+ 
                     parse_op_pt2(&mut items[i], &monkeys[m_idx].operation);
                     if &items[i].0 % monkeys[m_idx].test_div.to_bigint().unwrap() == BigInt::from(0) {
                         items[i].1 = monkeys[m_idx].true_dest;
@@ -200,7 +205,7 @@ fn process_monkeys_pt2(monkeys: &mut Vec<Monkey>, rounds: u32) {
     }
 }
 
-fn get_monkey_business(monkeys: &Vec<Monkey>) -> i32 {
+fn get_monkey_business(monkeys: &Vec<Monkey>) -> i64 {
     let mut inspected: Vec<i32> = Vec::new();
 
     for m in monkeys {
@@ -211,13 +216,13 @@ fn get_monkey_business(monkeys: &Vec<Monkey>) -> i32 {
     let first = inspected.pop().unwrap();
     let second = inspected.pop().unwrap();
 
-    first * second
+    first.to_i64().unwrap() * second.to_i64().unwrap()
 }
 
 fn main() {
     let mut monkeys = process_file("./day11.txt");
 
-    process_monkeys_pt2(&mut monkeys, 500);
+    process_monkeys_pt2(&mut monkeys, 10000);
 
     let monkey_business = get_monkey_business(&monkeys);
 
