@@ -193,7 +193,6 @@ fn process_monkeys_pt2(monkeys: &mut Vec<Monkey>, rounds: u32) {
                         items[i].1 = monkeys[m_idx].false_dest;
                     }
                     monkeys[m_idx].items_inspected += 1;
-
                 }
             }
             
@@ -218,7 +217,7 @@ fn get_monkey_business(monkeys: &Vec<Monkey>) -> i32 {
 fn main() {
     let mut monkeys = process_file("./day11.txt");
 
-    process_monkeys_pt2(&mut monkeys, 20);
+    process_monkeys_pt2(&mut monkeys, 500);
 
     let monkey_business = get_monkey_business(&monkeys);
 
@@ -316,6 +315,22 @@ mod test {
         assert_eq!(monkeys[1].items_inspected, 4);
         assert_eq!(monkeys[2].items_inspected, 3);
         assert_eq!(monkeys[3].items_inspected, 6);
+    }
+
+    #[test]
+    fn test_20_round_pt2() {
+        let mut monkeys = process_file("./tests/day11.txt");
+
+        // println!("Monkey initial state:");
+        // for (i,m) in monkeys.iter().enumerate() {
+        //     m.print(i)
+        // }
+        process_monkeys_pt2(&mut monkeys, 20);
+
+        assert_eq!(monkeys[0].items_inspected, 99);
+        assert_eq!(monkeys[1].items_inspected, 97);
+        assert_eq!(monkeys[2].items_inspected, 8);
+        assert_eq!(monkeys[3].items_inspected, 103);
     }
 
     #[test]
