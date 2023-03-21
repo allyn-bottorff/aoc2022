@@ -126,52 +126,6 @@ fn parse_op(item: i64, op_string: &Vec<String>) -> i64 {
     new_val
 }
 
-
-fn main() {
-    let mut monkeys = process_file("./day11.txt");
-
-    // for (i, monkey) in monkeys.iter().enumerate() {
-    //     println!("Monkey: {}", i);
-    //     println!("  Starting items: {:?}", monkey.items);
-    //     println!("  Operation: {:?}", monkey.operation);
-    //     println!("  Test divisor: {}", monkey.test_div);
-    //     println!("    True dest: {}", monkey.true_dest);
-    //     println!("    False dest: {}", monkey.false_dest);
-    // }
-    //
-
-    // for _round in 0..20 {
-    //     for m_idx in 0..monkeys.len() {
-    //         let mut true_temp_items = Vec::new();
-    //         let mut false_temp_items = Vec::new();
-    //         for i_idx in 0..monkeys[m_idx].items.len() {
-    //             monkeys[m_idx].items_inspected += 1;
-    //             let mut worry = parse_op(monkeys[m_idx].items[i_idx], &monkeys[m_idx].operation);
-    //             worry = worry / 3;
-    //             if worry % monkeys[m_idx].test_div == 0 {
-    //                 true_temp_items.push(worry);
-    //             } else {
-    //                 false_temp_items.push(worry);
-    //             }
-    //         }
-    //         let true_dest = monkeys[m_idx].true_dest;
-    //         let false_dest = monkeys[m_idx].false_dest;
-    //         monkeys[true_dest].items.extend(true_temp_items);
-    //         monkeys[false_dest].items.extend(false_temp_items);
-    //         monkeys[m_idx].items.clear();
-    //     }
-    // }
-
-    // let mut inspected: Vec<(usize, i32)> = Vec::new();
-    
-    process_monkeys(&mut monkeys, 20);
-
-    let monkey_business = get_monkey_business(&monkeys);
-
-    println!("monkey business: {}", monkey_business);
-}
-
-
 fn process_monkeys(monkeys: &mut Vec<Monkey>, rounds: u32) {
     for _round in 0..rounds {
         for m_idx in 0..monkeys.len() {
@@ -196,6 +150,28 @@ fn process_monkeys(monkeys: &mut Vec<Monkey>, rounds: u32) {
     }
 }
 
+fn process_monkeys_pt2(monkeys: &mut Vec<Monkey>, rounds: u32) {
+    for _round in 0..rounds {
+        for m_idx in 0..monkeys.len() {
+            let mut true_temp_items = Vec::new();
+            let mut false_temp_items = Vec::new();
+            for i_idx in 0..monkeys[m_idx].items.len() {
+                monkeys[m_idx].items_inspected += 1;
+                let worry = parse_op(monkeys[m_idx].items[i_idx], &monkeys[m_idx].operation);
+                if worry % monkeys[m_idx].test_div == 0 {
+                    true_temp_items.push(worry);
+                } else {
+                    false_temp_items.push(worry);
+                }
+            }
+            let true_dest = monkeys[m_idx].true_dest;
+            let false_dest = monkeys[m_idx].false_dest;
+            monkeys[true_dest].items.extend(true_temp_items);
+            monkeys[false_dest].items.extend(false_temp_items);
+            monkeys[m_idx].items.clear();
+        }
+    }
+}
 
 fn get_monkey_business(monkeys: &Vec<Monkey>) -> i32 {
     let mut inspected: Vec<i32> = Vec::new();
@@ -210,6 +186,18 @@ fn get_monkey_business(monkeys: &Vec<Monkey>) -> i32 {
 
     first * second
 }
+
+fn main() {
+    let mut monkeys = process_file("./day11.txt");
+
+    process_monkeys(&mut monkeys, 20);
+
+    let monkey_business = get_monkey_business(&monkeys);
+
+    println!("monkey business: {}", monkey_business);
+}
+
+// TESTS
 
 #[cfg(test)]
 mod test {
@@ -277,15 +265,29 @@ mod test {
         process_monkeys(&mut monkeys, 1);
         let mut test_monkey_items: Vec<Vec<i64>> = Vec::new();
 
-        test_monkey_items.push(vec![20,23,27,26]);
-        test_monkey_items.push(vec![2080,25,167,207,401,1046]);
+        test_monkey_items.push(vec![20, 23, 27, 26]);
+        test_monkey_items.push(vec![2080, 25, 167, 207, 401, 1046]);
         test_monkey_items.push(Vec::new());
         test_monkey_items.push(Vec::new());
-
 
         for (i, m) in monkeys.iter().enumerate() {
             assert_eq!(m.items, test_monkey_items[i])
         }
+    }
+    #[test]
+    fn test_one_round_pt2() {
+        let mut monkeys = process_file("./tests/day11.txt");
+
+        // println!("Monkey initial state:");
+        // for (i,m) in monkeys.iter().enumerate() {
+        //     m.print(i)
+        // }
+        process_monkeys_pt2(&mut monkeys, 1);
+
+        assert_eq!(monkeys[0].items_inspected, 2);
+        assert_eq!(monkeys[1].items_inspected, 4);
+        assert_eq!(monkeys[2].items_inspected, 3);
+        assert_eq!(monkeys[3].items_inspected, 6);
     }
 
     #[test]
@@ -295,7 +297,5 @@ mod test {
         let monkey_business = get_monkey_business(&monkeys);
 
         assert_eq!(monkey_business, 10605);
-
-
     }
 }
