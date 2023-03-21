@@ -2,8 +2,6 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-use num::ToPrimitive;
-use num::bigint::{BigInt, ToBigInt};
 
 struct Monkey {
     items: Vec<i64>,
@@ -128,17 +126,17 @@ fn parse_op(item: i64, op_string: &Vec<String>) -> i64 {
 
     new_val
 }
-fn parse_op_pt2(item_tuple: &mut (BigInt, usize), op_string: &Vec<String>) {
+fn parse_op_pt2(item_tuple: &mut (i64, usize), op_string: &Vec<String>) {
     
 
     let left = match op_string[2].as_str() {
-        "old" => item_tuple.0.clone(),
-        _ =>  BigInt::from(0),
+        "old" => item_tuple.0,
+        _ =>  0,
     };
 
     let right = match op_string[4].as_str() {
-        "old" => item_tuple.0.clone(),
-        _ => op_string[4].parse::<i32>().unwrap().to_bigint().unwrap(),
+        "old" => item_tuple.0,
+        _ => op_string[4].parse().unwrap(),
     };
 
     item_tuple.0 = match op_string[3].as_str() {
@@ -174,12 +172,12 @@ fn process_monkeys(monkeys: &mut Vec<Monkey>, rounds: u32) {
 }
 
 fn process_monkeys_pt2(monkeys: &mut Vec<Monkey>, rounds: u32) {
-    let mut items: Vec<(BigInt, usize)> = Vec::new(); //store the items in their own vector and
+    let mut items: Vec<(i64, usize)> = Vec::new(); //store the items in their own vector and
                                                       //reference monkeys
     let mut supermod = 1;
     for m_idx in 0..monkeys.len() {
         for i_idx in 0..monkeys[m_idx].items.len() {
-            items.push((BigInt::from(monkeys[m_idx].items[i_idx]), m_idx));
+            items.push((i64::from(monkeys[m_idx].items[i_idx]), m_idx));
         }
         supermod = supermod * monkeys[m_idx].test_div;
     }
@@ -189,10 +187,10 @@ fn process_monkeys_pt2(monkeys: &mut Vec<Monkey>, rounds: u32) {
             for i in 0..items.len() {
                 if items[i].1 == m_idx{
 
-                    items[i].0 = items[i].0.clone() % supermod;
+                    items[i].0 = items[i].0 % supermod;
  
                     parse_op_pt2(&mut items[i], &monkeys[m_idx].operation);
-                    if &items[i].0 % monkeys[m_idx].test_div.to_bigint().unwrap() == BigInt::from(0) {
+                    if &items[i].0 % monkeys[m_idx].test_div == 0 {
                         items[i].1 = monkeys[m_idx].true_dest;
                     } else {
                         items[i].1 = monkeys[m_idx].false_dest;
@@ -216,7 +214,7 @@ fn get_monkey_business(monkeys: &Vec<Monkey>) -> i64 {
     let first = inspected.pop().unwrap();
     let second = inspected.pop().unwrap();
 
-    first.to_i64().unwrap() * second.to_i64().unwrap()
+    i64::from(first) * i64::from(second)
 }
 
 fn main() {
