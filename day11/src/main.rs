@@ -220,6 +220,7 @@ fn get_monkey_business(monkeys: &Vec<Monkey>) -> i64 {
 fn main() {
     let mut monkeys = process_file("./day11.txt");
 
+    // process_monkeys(&mut monkeys, 10000);
     process_monkeys_pt2(&mut monkeys, 10000);
 
     let monkey_business = get_monkey_business(&monkeys);
